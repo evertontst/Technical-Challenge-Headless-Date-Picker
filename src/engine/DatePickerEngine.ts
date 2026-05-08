@@ -26,8 +26,14 @@ function computeLeadingDays(
   return (firstOfMonth.dayOfWeek - anchor + 7) % 7;
 }
 
-const notImplemented = (method: string): Error =>
-  new Error(`DatePickerEngine.${method}() is not yet implemented`);
+function plainDateEquals(
+  a: Temporal.PlainDate | null,
+  b: Temporal.PlainDate | null,
+): boolean {
+  if (a === b) return true;
+  if (a === null || b === null) return false;
+  return a.equals(b);
+}
 
 export class DatePickerEngine {
   private state: EngineState;
@@ -35,6 +41,7 @@ export class DatePickerEngine {
   private readonly minDate: Temporal.PlainDate | null;
   private readonly maxDate: Temporal.PlainDate | null;
   private readonly locale: string | undefined;
+  private readonly listeners: Set<Listener> = new Set();
 
   constructor(options: EngineOptions = {}) {
     const today = Temporal.Now.plainDateISO();
@@ -126,7 +133,24 @@ export class DatePickerEngine {
   }
 
   private setState(patch: Partial<EngineState>): void {
-    this.state = { ...this.state, ...patch };
+    const next: EngineState = { ...this.state, ...patch };
+    if (this.statesEqual(this.state, next)) return;
+    this.state = next;
+    this.notify();
+  }
+
+  private statesEqual(a: EngineState, b: EngineState): boolean {
+    return (
+      a.viewYearMonth.equals(b.viewYearMonth) &&
+      plainDateEquals(a.selectedDate, b.selectedDate) &&
+      a.today.equals(b.today)
+    );
+  }
+
+  private notify(): void {
+    for (const listener of [...this.listeners]) {
+      listener(this.state);
+    }
   }
 
   select(date: DateInput): void {
@@ -142,7 +166,10 @@ export class DatePickerEngine {
     this.setState({ selectedDate: null });
   }
 
-  subscribe(_listener: Listener): Unsubscribe {
-    throw notImplemented('subscribe');
+  subscribe(listener: Listener): Unsubscribe {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 }
