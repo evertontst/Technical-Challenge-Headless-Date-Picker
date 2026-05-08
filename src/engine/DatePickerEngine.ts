@@ -101,27 +101,32 @@ export class DatePickerEngine {
   }
 
   nextMonth(): void {
-    throw notImplemented('nextMonth');
+    this.setState({ viewYearMonth: this.state.viewYearMonth.add({ months: 1 }) });
   }
 
   prevMonth(): void {
-    throw notImplemented('prevMonth');
+    this.setState({ viewYearMonth: this.state.viewYearMonth.subtract({ months: 1 }) });
   }
 
   nextYear(): void {
-    throw notImplemented('nextYear');
+    this.setState({ viewYearMonth: this.state.viewYearMonth.add({ years: 1 }) });
   }
 
   prevYear(): void {
-    throw notImplemented('prevYear');
+    this.setState({ viewYearMonth: this.state.viewYearMonth.subtract({ years: 1 }) });
   }
 
   goToToday(): void {
-    throw notImplemented('goToToday');
+    this.setState({ viewYearMonth: this.state.today.toPlainYearMonth() });
   }
 
-  goToYearMonth(_ym: YearMonthInput): void {
-    throw notImplemented('goToYearMonth');
+  goToYearMonth(ym: YearMonthInput): void {
+    const target = typeof ym === 'string' ? Temporal.PlainYearMonth.from(ym) : ym;
+    this.setState({ viewYearMonth: target });
+  }
+
+  private setState(patch: Partial<EngineState>): void {
+    this.state = { ...this.state, ...patch };
   }
 
   select(_date: DateInput): void {
