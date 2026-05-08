@@ -11,9 +11,19 @@ import type {
 } from './types';
 
 const DEFAULT_FIRST_DAY_OF_WEEK: WeekStartDay = 1;
+const GRID_CELLS = 42;
 
 function toPlainDate(input: DateInput): Temporal.PlainDate {
   return typeof input === 'string' ? Temporal.PlainDate.from(input) : input;
+}
+
+function computeLeadingDays(
+  firstOfMonth: Temporal.PlainDate,
+  firstDayOfWeek: WeekStartDay,
+): number {
+  // Temporal: dayOfWeek 1=Mon … 7=Sun. Our setting: 0=Sun, 1=Mon … 6=Sat.
+  const anchor = firstDayOfWeek === 0 ? 7 : firstDayOfWeek;
+  return (firstOfMonth.dayOfWeek - anchor + 7) % 7;
 }
 
 const notImplemented = (method: string): Error =>
@@ -47,11 +57,47 @@ export class DatePickerEngine {
   }
 
   getGrid(): readonly DayCell[] {
-    throw notImplemented('getGrid');
+    const { viewYearMonth, selectedDate, today } = this.state;
+    const firstOfMonth = viewYearMonth.toPlainDate({ day: 1 });
+    const leadingDays = computeLeadingDays(firstOfMonth, this.firstDayOfWeek);
+    const startDate = firstOfMonth.subtract({ days: leadingDays });
+
+    const cells: DayCell[] = [];
+    for (let i = 0; i < GRID_CELLS; i++) {
+      const date = startDate.add({ days: i });
+      cells.push({
+        date,
+        iso: date.toString(),
+        dayOfMonth: date.day,
+        isCurrentMonth:
+          date.year === viewYearMonth.year && date.month === viewYearMonth.month,
+        isToday: date.equals(today),
+        isSelected: selectedDate ? date.equals(selectedDate) : false,
+        isDisabled: this.isDateDisabled(date),
+      });
+    }
+    return cells;
   }
 
   getWeekdayLabels(): readonly string[] {
-    throw notImplemented('getWeekdayLabels');
+    // Anchor on a known Sunday so anchor[0..6] = [Sun, Mon, Tue, Wed, Thu, Fri, Sat].
+    const sunday = Temporal.PlainDate.from({ year: 2024, month: 1, day: 7 });
+    const anchored: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const day = sunday.add({ days: i });
+      anchored.push(day.toLocaleString(this.locale, { weekday: 'short' }));
+    }
+    const labels: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      labels.push(anchored[(i + this.firstDayOfWeek) % 7]!);
+    }
+    return labels;
+  }
+
+  private isDateDisabled(date: Temporal.PlainDate): boolean {
+    if (this.minDate && Temporal.PlainDate.compare(date, this.minDate) < 0) return true;
+    if (this.maxDate && Temporal.PlainDate.compare(date, this.maxDate) > 0) return true;
+    return false;
   }
 
   nextMonth(): void {
