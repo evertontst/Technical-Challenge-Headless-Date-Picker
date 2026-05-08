@@ -12,6 +12,7 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "^0.4.4",
     "vue": "^3.5.13"
   },
   "devDependencies": {
