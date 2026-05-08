@@ -129,12 +129,17 @@ export class DatePickerEngine {
     this.state = { ...this.state, ...patch };
   }
 
-  select(_date: DateInput): void {
-    throw notImplemented('select');
+  select(date: DateInput): void {
+    const target = toPlainDate(date);
+    if (this.isDateDisabled(target)) return;
+    this.setState({
+      selectedDate: target,
+      viewYearMonth: target.toPlainYearMonth(),
+    });
   }
 
   clear(): void {
-    throw notImplemented('clear');
+    this.setState({ selectedDate: null });
   }
 
   subscribe(_listener: Listener): Unsubscribe {
