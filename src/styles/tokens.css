@@ -1,0 +1,61 @@
+/*
+ * Design tokens for the headless date picker.
+ * Every visual property used by the component reads from a CSS custom property,
+ * so consumers can re-theme by overriding these on :root or any ancestor.
+ */
+:root {
+  /* Surface colors */
+  --dp-color-bg: #ffffff;
+  --dp-color-fg: #0f172a;
+  --dp-color-muted: #94a3b8;
+  --dp-color-border: #e5e7eb;
+  --dp-color-hover: #f3f4f6;
+  --dp-color-disabled-fg: #cbd5e1;
+
+  /* Brand / state colors */
+  --dp-color-accent: #2563eb;
+  --dp-color-accent-fg: #ffffff;
+  --dp-color-today-ring: #2563eb;
+
+  /* Sizing */
+  --dp-input-height: 36px;
+  --dp-popover-width: 280px;
+  --dp-cell-size: 36px;
+
+  /* Spacing */
+  --dp-padding: 12px;
+  --dp-gap: 4px;
+
+  /* Radius */
+  --dp-radius: 8px;
+  --dp-radius-cell: 6px;
+  --dp-radius-input: 6px;
+
+  /* Typography */
+  --dp-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --dp-font-size: 14px;
+  --dp-font-size-label: 12px;
+  --dp-font-weight-day: 400;
+  --dp-font-weight-current: 600;
+
+  /* Effects */
+  --dp-shadow:
+    0 4px 12px rgb(0 0 0 / 0.08),
+    0 0 0 1px rgb(0 0 0 / 0.04);
+  --dp-transition: 120ms ease-out;
+  --dp-focus-ring: 0 0 0 2px var(--dp-color-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --dp-color-bg: #0f172a;
+    --dp-color-fg: #f1f5f9;
+    --dp-color-muted: #64748b;
+    --dp-color-border: #1e293b;
+    --dp-color-hover: #1e293b;
+    --dp-color-disabled-fg: #334155;
+    --dp-shadow:
+      0 4px 12px rgb(0 0 0 / 0.4),
+      0 0 0 1px rgb(255 255 255 / 0.05);
+  }
+}
