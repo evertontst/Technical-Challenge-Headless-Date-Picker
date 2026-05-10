@@ -26,6 +26,20 @@ DatePicker.vue  →  CalendarHeader + CalendarGrid
                    themed via --dp-* CSS custom properties
 ```
 
+## Engine options
+
+The engine constructor accepts:
+
+| Option | Type | Default | Notes |
+|---|---|---|---|
+| `initialDate` | ISO string \| `Temporal.PlainDate` | `null` | Pre-select a date and open the view on its month. |
+| `firstDayOfWeek` | `0 \| 1 \| ... \| 6` | `1` (Monday) | `0` = Sunday for US-style weeks. |
+| `minDate` | ISO string \| `Temporal.PlainDate` | unbounded | Earlier days are disabled and unselectable. |
+| `maxDate` | ISO string \| `Temporal.PlainDate` | unbounded | Later days are disabled and unselectable. |
+| `locale` | string | system | Passed to `Intl.DateTimeFormat` for weekday and month labels. |
+
+The demo page exercises only the default configuration; the engine tests in `tests/engine/` cover every option.
+
 ## State management
 
 The engine exposes a classic observer pattern:
@@ -102,6 +116,6 @@ src/
 │   └── useDatePicker.ts     Vue ↔ engine bridge
 ├── components/              DatePicker, CalendarHeader, CalendarGrid
 ├── styles/tokens.css        all --dp-* tokens
-└── App.vue                  demo (3 picker variants)
+└── App.vue                  demo (single picker, default config)
 tests/engine/                Vitest suites
 ```
