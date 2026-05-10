@@ -3,79 +3,99 @@ import { ref } from 'vue';
 import DatePicker from './components/DatePicker.vue';
 
 const value = ref<string | null>(null);
-const valueWithBounds = ref<string | null>(null);
 const sundayStart = ref<string | null>('2026-05-09');
+const valueWithBounds = ref<string | null>(null);
 
 const today = new Date().toISOString().slice(0, 10);
-const minIso = (() => {
+
+function isoOffset(days: number): string {
   const d = new Date();
-  d.setDate(d.getDate() - 7);
+  d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
-})();
-const maxIso = (() => {
-  const d = new Date();
-  d.setDate(d.getDate() + 14);
-  return d.toISOString().slice(0, 10);
-})();
+}
+
+const minIso = isoOffset(-7);
+const maxIso = isoOffset(14);
 </script>
 
 <template>
   <main class="page">
-    <header class="page__header">
-      <h1>Headless Date Picker</h1>
-      <p class="lede">
-        A vanilla TypeScript engine + a thin Vue 3 wrapper. Powered by the Temporal API.
+    <header class="page-header">
+      <h1 class="title">Headless Date Picker</h1>
+      <p class="subtitle">
+        A Vue 3 wrapper around a vanilla TypeScript engine, built on the Temporal API.
       </p>
     </header>
 
     <section class="demo">
-      <label for="dp-default" class="demo__label">Default (week starts Monday)</label>
-      <DatePicker
-        input-id="dp-default"
-        v-model="value"
-        placeholder="Pick a date"
-      />
-      <output class="demo__output">
-        {{ value ? `Selected ISO: ${value}` : 'Nothing selected' }}
-      </output>
+      <div class="demo__meta">
+        <label for="dp-default" class="demo__label">Default</label>
+        <p class="demo__description">Week starts Monday.</p>
+      </div>
+      <div class="demo__field">
+        <DatePicker
+          input-id="dp-default"
+          v-model="value"
+          placeholder="Pick a date"
+        />
+        <output class="demo__output">
+          {{ value ? `selected — ${value}` : 'no selection' }}
+        </output>
+      </div>
     </section>
 
     <section class="demo">
-      <label for="dp-sunday" class="demo__label">
-        Week starts Sunday, locale en-US
-      </label>
-      <DatePicker
-        input-id="dp-sunday"
-        v-model="sundayStart"
-        :first-day-of-week="0"
-        locale="en-US"
-        placeholder="MM/DD/YYYY"
-      />
-      <output class="demo__output">
-        {{ sundayStart ? `Selected ISO: ${sundayStart}` : 'Nothing selected' }}
-      </output>
+      <div class="demo__meta">
+        <label for="dp-sunday" class="demo__label">Sunday start</label>
+        <p class="demo__description">
+          Locale <code>en-US</code>, week begins Sunday.
+        </p>
+      </div>
+      <div class="demo__field">
+        <DatePicker
+          input-id="dp-sunday"
+          v-model="sundayStart"
+          :first-day-of-week="0"
+          locale="en-US"
+          placeholder="MM/DD/YYYY"
+        />
+        <output class="demo__output">
+          {{ sundayStart ? `selected — ${sundayStart}` : 'no selection' }}
+        </output>
+      </div>
     </section>
 
     <section class="demo">
-      <label for="dp-bounds" class="demo__label">
-        Constrained to {{ minIso }} → {{ maxIso }} (today: {{ today }})
-      </label>
-      <DatePicker
-        input-id="dp-bounds"
-        v-model="valueWithBounds"
-        :min-date="minIso"
-        :max-date="maxIso"
-        placeholder="In-range only"
-      />
-      <output class="demo__output">
-        {{ valueWithBounds ? `Selected ISO: ${valueWithBounds}` : 'Nothing selected' }}
-      </output>
+      <div class="demo__meta">
+        <label for="dp-bounds" class="demo__label">Bounded</label>
+        <p class="demo__description">
+          Constrained to {{ minIso }} → {{ maxIso }} (today: {{ today }}).
+        </p>
+      </div>
+      <div class="demo__field">
+        <DatePicker
+          input-id="dp-bounds"
+          v-model="valueWithBounds"
+          :min-date="minIso"
+          :max-date="maxIso"
+          placeholder="In-range only"
+        />
+        <output class="demo__output">
+          {{ valueWithBounds ? `selected — ${valueWithBounds}` : 'no selection' }}
+        </output>
+      </div>
     </section>
 
-    <footer class="page__footer">
-      <p>
-        Try keyboard nav: <kbd>Tab</kbd> to focus, <kbd>Enter</kbd>/<kbd>↓</kbd>
-        to open, arrows to move, <kbd>Enter</kbd> to select, <kbd>Esc</kbd> to close.
+    <footer class="page-footer">
+      <p class="footer-line">
+        <span class="footer-label">Keyboard</span>
+        <kbd>Enter</kbd> / <kbd>↓</kbd> open
+        <span class="sep">·</span>
+        <kbd>Esc</kbd> close
+        <span class="sep">·</span>
+        <kbd>← → ↑ ↓</kbd> navigate
+        <span class="sep">·</span>
+        <kbd>Enter</kbd> select
       </p>
     </footer>
   </main>
@@ -83,70 +103,148 @@ const maxIso = (() => {
 
 <style scoped>
 .page {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1.5rem;
-  font-family: var(--dp-font-family);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 96px 32px 64px;
+  font-family: var(--dp-font-sans);
   color: var(--dp-color-fg);
 }
 
-.page__header {
-  margin-bottom: 2.5rem;
+.page-header {
+  margin-bottom: 64px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--dp-color-rule);
 }
 
-h1 {
-  margin: 0 0 0.5rem;
-  font-size: 1.875rem;
-  font-weight: 600;
+.title {
+  margin: 0 0 12px;
+  font-family: var(--dp-font-display);
+  font-weight: 500;
+  font-size: clamp(36px, 6vw, 56px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--dp-color-fg);
 }
 
-.lede {
+.subtitle {
   margin: 0;
+  max-width: 52ch;
+  font-size: 16px;
+  line-height: 1.55;
   color: var(--dp-color-muted);
-  font-size: 1rem;
 }
 
 .demo {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  align-items: flex-start;
+  padding: 28px 0;
+  border-bottom: 1px dashed var(--dp-color-rule);
+}
+
+.demo:last-of-type {
+  border-bottom: 0;
+}
+
+.demo__meta {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  gap: 4px;
+  padding-top: 12px;
 }
 
 .demo__label {
-  font-size: 0.875rem;
+  font-family: var(--dp-font-display);
+  font-style: italic;
   font-weight: 500;
+  font-size: 18px;
+  color: var(--dp-color-fg);
+  letter-spacing: -0.01em;
+}
+
+.demo__description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--dp-color-muted);
+}
+
+.demo__description code {
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
+  color: var(--dp-color-fg);
+  background: var(--dp-color-hover);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.demo__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .demo__output {
-  font-size: 0.8125rem;
+  font-family: var(--dp-font-mono);
+  font-size: 12px;
   color: var(--dp-color-muted);
+  letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
 }
 
-.page__footer {
-  margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--dp-color-border);
-  font-size: 0.875rem;
+.page-footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--dp-color-rule);
+}
+
+.footer-line {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--dp-font-sans);
+  font-size: 12px;
   color: var(--dp-color-muted);
 }
 
-kbd {
-  display: inline-block;
-  padding: 1px 6px;
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.75rem;
-  background: var(--dp-color-hover);
-  border: 1px solid var(--dp-color-border);
-  border-radius: 4px;
+.footer-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 500;
+  margin-right: 8px;
 }
-</style>
 
-<style>
-body {
-  margin: 0;
-  background: var(--dp-color-bg);
+.sep {
+  color: var(--dp-color-rule);
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  font-family: var(--dp-font-mono);
+  font-size: 11px;
+  color: var(--dp-color-fg);
+  background: var(--dp-color-surface);
+  border: 1px solid var(--dp-color-border);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 64px 20px 48px;
+  }
+  .demo {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .demo__meta {
+    padding-top: 0;
+  }
 }
 </style>

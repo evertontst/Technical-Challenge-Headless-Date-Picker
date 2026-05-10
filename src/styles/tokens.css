@@ -1,61 +1,119 @@
 /*
- * Design tokens for the headless date picker.
- * Every visual property used by the component reads from a CSS custom property,
- * so consumers can re-theme by overriding these on :root or any ancestor.
+ * Design tokens — Editorial Almanac.
+ * Every visual property reads from a CSS custom property, so the picker
+ * can be retitled, repainted, or restyled without touching a single .vue file.
  */
 :root {
-  /* Surface colors */
-  --dp-color-bg: #ffffff;
-  --dp-color-fg: #0f172a;
-  --dp-color-muted: #94a3b8;
-  --dp-color-border: #e5e7eb;
-  --dp-color-hover: #f3f4f6;
-  --dp-color-disabled-fg: #cbd5e1;
+  /* Typography stacks */
+  --dp-font-display: 'Fraunces', 'Times New Roman', Georgia, serif;
+  --dp-font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --dp-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --dp-font-family: var(--dp-font-sans);
 
-  /* Brand / state colors */
-  --dp-color-accent: #2563eb;
-  --dp-color-accent-fg: #ffffff;
-  --dp-color-today-ring: #2563eb;
+  /* Surface — warm cream paper */
+  --dp-color-bg: #f1ead8;
+  --dp-color-surface: #faf5e8;
+  --dp-color-fg: #1c1814;
+  --dp-color-muted: #847a6c;
+  --dp-color-border: #d9cdb3;
+  --dp-color-rule: #c4b89c;
+  --dp-color-hover: #ebe0c5;
+  --dp-color-disabled-fg: #c4b89c;
+
+  /* Brand — oxblood */
+  --dp-color-accent: #7a2a25;
+  --dp-color-accent-soft: #a05049;
+  --dp-color-accent-fg: #faf5e8;
+  --dp-color-today-ring: #7a2a25;
 
   /* Sizing */
-  --dp-input-height: 36px;
-  --dp-popover-width: 280px;
-  --dp-cell-size: 36px;
+  --dp-input-height: 46px;
+  --dp-popover-width: 320px;
+  --dp-cell-size: 40px;
 
   /* Spacing */
-  --dp-padding: 12px;
-  --dp-gap: 4px;
+  --dp-padding: 18px;
+  --dp-gap: 2px;
 
   /* Radius */
-  --dp-radius: 8px;
-  --dp-radius-cell: 6px;
-  --dp-radius-input: 6px;
+  --dp-radius: 6px;
+  --dp-radius-cell: 999px;
+  --dp-radius-input: 2px;
 
-  /* Typography */
-  --dp-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --dp-font-size: 14px;
-  --dp-font-size-label: 12px;
+  /* Type sizes */
+  --dp-font-size: 15px;
+  --dp-font-size-label: 11px;
+  --dp-font-size-display: 17px;
   --dp-font-weight-day: 400;
-  --dp-font-weight-current: 600;
+  --dp-font-weight-current: 500;
 
   /* Effects */
   --dp-shadow:
-    0 4px 12px rgb(0 0 0 / 0.08),
-    0 0 0 1px rgb(0 0 0 / 0.04);
-  --dp-transition: 120ms ease-out;
-  --dp-focus-ring: 0 0 0 2px var(--dp-color-accent);
+    0 1px 0 rgb(28 24 20 / 0.04),
+    0 12px 32px -12px rgb(28 24 20 / 0.18),
+    0 0 0 1px rgb(28 24 20 / 0.06);
+  --dp-transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --dp-focus-ring: 0 0 0 2px var(--dp-color-bg), 0 0 0 4px var(--dp-color-accent);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --dp-color-bg: #0f172a;
-    --dp-color-fg: #f1f5f9;
-    --dp-color-muted: #64748b;
-    --dp-color-border: #1e293b;
-    --dp-color-hover: #1e293b;
-    --dp-color-disabled-fg: #334155;
+    --dp-color-bg: #15110d;
+    --dp-color-surface: #1d1813;
+    --dp-color-fg: #ebe0c8;
+    --dp-color-muted: #7e7461;
+    --dp-color-border: #2a2218;
+    --dp-color-rule: #322820;
+    --dp-color-hover: #261e15;
+    --dp-color-disabled-fg: #463b2c;
+    --dp-color-accent: #c87a5e;
+    --dp-color-accent-soft: #8e5341;
+    --dp-color-accent-fg: #15110d;
+    --dp-color-today-ring: #c87a5e;
     --dp-shadow:
-      0 4px 12px rgb(0 0 0 / 0.4),
-      0 0 0 1px rgb(255 255 255 / 0.05);
+      0 1px 0 rgb(0 0 0 / 0.4),
+      0 16px 40px -16px rgb(0 0 0 / 0.6),
+      0 0 0 1px rgb(255 255 255 / 0.04);
+    --dp-focus-ring: 0 0 0 2px var(--dp-color-bg), 0 0 0 4px var(--dp-color-accent);
   }
+}
+
+/* Page-level reset for the demo (not part of the picker itself). */
+html, body {
+  margin: 0;
+  background: var(--dp-color-bg);
+  color: var(--dp-color-fg);
+  font-family: var(--dp-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Subtle paper grain — pure SVG noise, no extra HTTP request. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  body::before {
+    mix-blend-mode: screen;
+    opacity: 0.06;
+  }
+}
+
+::selection {
+  background: var(--dp-color-accent);
+  color: var(--dp-color-accent-fg);
 }

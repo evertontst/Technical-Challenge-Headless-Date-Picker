@@ -26,7 +26,7 @@ const emit = defineEmits<{
         class="dp-weekday"
         role="columnheader"
         scope="col"
-      >{{ label }}</span>
+      >{{ label.slice(0, 1) }}</span>
     </div>
     <div class="dp-grid-body" role="rowgroup">
       <button
@@ -48,7 +48,7 @@ const emit = defineEmits<{
         :tabindex="focusedIso === cell.iso ? 0 : -1"
         role="gridcell"
         @click="emit('select', cell.date)"
-      >{{ cell.dayOfMonth }}</button>
+      ><span>{{ cell.dayOfMonth }}</span></button>
     </div>
   </div>
 </template>
@@ -57,13 +57,13 @@ const emit = defineEmits<{
 .dp-grid {
   display: flex;
   flex-direction: column;
-  gap: var(--dp-gap);
+  gap: 6px;
 }
 
 .dp-weekday-row,
 .dp-grid-body {
   display: grid;
-  grid-template-columns: repeat(7, var(--dp-cell-size));
+  grid-template-columns: repeat(7, 1fr);
   gap: var(--dp-gap);
 }
 
@@ -74,60 +74,90 @@ const emit = defineEmits<{
 .dp-weekday {
   display: grid;
   place-items: center;
-  height: calc(var(--dp-cell-size) * 0.75);
+  height: 24px;
+  font-family: var(--dp-font-sans);
   font-size: var(--dp-font-size-label);
+  font-weight: 500;
   color: var(--dp-color-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.16em;
 }
 
 .dp-cell {
+  position: relative;
   display: grid;
   place-items: center;
-  width: var(--dp-cell-size);
+  width: 100%;
   height: var(--dp-cell-size);
   padding: 0;
-  border: none;
+  border: 0;
   background: transparent;
-  color: var(--dp-color-fg);
-  border-radius: var(--dp-radius-cell);
-  font-family: inherit;
-  font-size: var(--dp-font-size);
+  color: var(--dp-color-muted);
+  font-family: var(--dp-font-mono);
+  font-size: 13px;
   font-weight: var(--dp-font-weight-day);
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background-color var(--dp-transition), color var(--dp-transition);
+  border-radius: var(--dp-radius-cell);
+  transition:
+    background-color var(--dp-transition),
+    color var(--dp-transition),
+    transform var(--dp-transition);
 }
 
-.dp-cell:not(.dp-cell--current) {
-  color: var(--dp-color-muted);
+.dp-cell > span {
+  position: relative;
+  z-index: 1;
+  line-height: 1;
 }
 
 .dp-cell.dp-cell--current {
+  color: var(--dp-color-fg);
   font-weight: var(--dp-font-weight-current);
 }
 
-.dp-cell:hover:not(:disabled) {
+.dp-cell:hover:not(:disabled):not(.dp-cell--selected) {
   background: var(--dp-color-hover);
+  color: var(--dp-color-fg);
 }
 
-.dp-cell.dp-cell--today:not(.dp-cell--selected) {
-  box-shadow: inset 0 0 0 1px var(--dp-color-today-ring);
+.dp-cell:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.dp-cell.dp-cell--today:not(.dp-cell--selected)::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--dp-color-today-ring);
+  border-radius: var(--dp-radius-cell);
+  opacity: 0.7;
 }
 
 .dp-cell.dp-cell--selected {
-  background: var(--dp-color-accent);
   color: var(--dp-color-accent-fg);
+  font-weight: 500;
+}
+
+.dp-cell.dp-cell--selected::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: var(--dp-color-accent);
+  border-radius: var(--dp-radius-cell);
+  z-index: 0;
 }
 
 .dp-cell.dp-cell--disabled {
   color: var(--dp-color-disabled-fg);
   cursor: not-allowed;
+  text-decoration: line-through;
+  text-decoration-thickness: 0.5px;
+  text-decoration-color: var(--dp-color-disabled-fg);
 }
 
 .dp-cell:focus-visible {
   outline: none;
   box-shadow: var(--dp-focus-ring);
-  position: relative;
-  z-index: 1;
 }
 </style>
